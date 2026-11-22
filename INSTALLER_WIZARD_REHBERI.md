@@ -28,10 +28,10 @@ flowchart LR
 
 > **AJAN TALİMATI (ZORUNLU):**
 > Eğer kullanıcı bu dokümanı kendi projesine benzer bir installer/güncelleme sistemi kurmak için paylaştıysa, **hemen kod yazmaya BAŞLAMA**.
-> Önce projenin kök dizinini hızlıca incele (giriş dosyası, framework, `requirements.txt`, mevcut klasör yapısı) ve ardından kullanıcıya aşağıdaki **5 Sihirbaz Sorusunu** tek seferde, kısa ve seçmeli şekilde sor.
+> Önce projenin kök dizinini hızlıca incele (giriş dosyası, framework, `requirements.txt`, mevcut klasör yapısı) ve ardından kullanıcıya aşağıdaki **6 Sihirbaz Sorusunu** tek seferde, kısa ve seçmeli şekilde sor.
 > Kullanıcının cevabına göre yalnızca gerekli seviyeyi uygula; istenmeyen modülleri (ör. istemiyorsa update sunucusu veya Host/Client mantığını) projeye ekleme.
 
-### Ajanın Kullanıcıya Soracağı 5 Sihirbaz Sorusu
+### Ajanın Kullanıcıya Soracağı 6 Sihirbaz Sorusu
 
 1. **Hangi Seviye Lazım?**
    - **A) Seviye 1 — Sadece Kurulum Paketi (`Setup.exe`)**: Otomatik güncelleme olmasın; sadece tek komutla EXE derleyip profesyonel Windows kurulum dosyası üretsin, güncellemelerde kullanıcı verisini silmesin.
@@ -53,6 +53,11 @@ flowchart LR
    - Sürüm numarası tek dosyadan (`config.py`) tüm dosyalara otomatik yayılsın mı?
    - Aynı sürüm zaten derlenmişse eski `Setup.exe` üzerine yazmamak için otomatik sürüm artırılsın mı (`1.0` → `1.1`)?
    - Tek tık `.bat` derleme betiği veya basit bir derleme komutu yeterli mi?
+
+6. **Windows SmartScreen & Dijital İmza (Code Signing) İhtiyacı Nedir?**
+   - **A)** Elimde OV/EV Code Signing sertifikası veya Azure Artifact Signing var (`SignTool` entegrasyonu kurulsun)
+   - **B)** İmza sertifikam yok, ancak son kullanıcıda sıfır SmartScreen uyarısı istiyorum (**Microsoft Store / MSIX** dağıtımına uygun yapılandırma önerilsin)
+   - **C)** Şimdilik imzasız olsun (Kurumsal/sınırlı müşteri kitlesi; ilk kurulumda SmartScreen uyarısının normal olduğu biliniyor)
 
 > **Onay Kapısı:** Kullanıcı yanıt verdikten sonra, ajan önce **oluşturulacak/düzenlenecek dosyaların kısa listesini** sunar, onay aldıktan sonra implementasyona geçer.
 
@@ -151,3 +156,14 @@ Güncelleme dosyalarının dışarıdan rastgele taranmasını engellemek isteye
 - **Türkçe Karakter Kodlaması:** `installer.iss` dosyası Inno Setup derleyicisi tarafından okunurken Türkçe karakterlerin bozulmaması için dosya kodlaması (UTF-8 BOM veya Windows-1254) ile Python'daki okuma/yazma kodlaması tutarlı tutulmalıdır.
 - **Terminal Disk Şişmesi:** LAN dağıtım mimarisinde kurulum `.exe` önbelleği (`data/updates/`) yalnızca `HOST` makinede tutulmalı, `CLIENT` makinelerde temizlenmelidir.
 - **Asla Gizli Bilgi Gömme (Şablon Paylaşım Kuralı):** Başka projeye uyarlarken token, sunucu IP'si veya domain adresleri ortam değişkeni / yapılandırma dosyası üzerinden alınmalıdır.
+
+---
+
+## 5. Windows SmartScreen & Dijital İmza Gerçeği (Önemli Uyarı)
+
+Müşteriler web'den indirilen bir `Setup.exe` dosyasını çalıştırdığında **Windows SmartScreen ("Windows kişisel bilgisayarınızı korudu / Bilinmeyen yayımcı")** uyarısı görebilir. Bu konuda ajanın ve geliştiricinin bilmesi gereken güncel kurallar şunlardır:
+
+- **Kod/Installer Ayarı ile Atlatılamaz:** PyInstaller veya Inno Setup ayarlarıyla SmartScreen kapatılamaz; self-signed (kendi ürettiğiniz) sertifika da dışarıdaki müşteri bilgisayarlarında SmartScreen'i aşmaz.
+- **EV Sertifikada "Anında Güven" Dönemi Bitti:** Microsoft, geleneksel EV Code Signing sertifikalarının ilk indirmede anında SmartScreen bypass ayrıcalığını kaldırmıştır. OV, EV veya Azure Artifact Signing ile imzalanan yeni bir sürüm bile yeterli indirme itibarı (reputation) birikene kadar uyarı gösterebilir; ancak aynı sertifika kullanıldığı sürece **yayımcı itibarı korunur** ve sonraki güncellemelerde uyarı hızla kalkar.
+- **`SignTool` Entegrasyonu:** Geçerli bir Code Signing sertifikası varsa, ajan `installer.iss` `[Setup]` bölümüne `SignTool=...` ve `SignedUninstaller=yes` direktiflerini ekleyerek hem EXE'yi hem `Setup.exe` + `unins000.exe` dosyalarını otomatik imzalayacak şekilde kurar.
+- **Sıfır SmartScreen Uyarısı İçin Tek Resmi Yol (Microsoft Store):** Paketi **Microsoft Store** üzerinden yayınladığınızda Microsoft uygulamayı kendi sertifikasıyla yeniden imzalar; böylece son kullanıcıda SmartScreen uyarısı **hiç çıkmaz**.

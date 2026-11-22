@@ -40,7 +40,7 @@ flowchart LR
 1. Bu repodaki [`INSTALLER_WIZARD_REHBERI.md`](./INSTALLER_WIZARD_REHBERI.md) dosyasını indir (veya ham URL'sini kopyala).
 2. Kendi projenin bulunduğu ortamda kullandığın yapay zekâ kodlama ajanına şu komutu ver:
    > *"Bu `INSTALLER_WIZARD_REHBERI.md` dosyasını oku. İçindeki **Agent Wizard** kurallarına uyarak önce benim projemi incele ve bana kurulum sihirbazı sorularını sor; seçtiğim seviyeye göre kurulum altyapısını projeme kur."*
-3. Ajan sana 5 kısa soru soracak; örneğin sadece **Seviye 1** seçersen update sunucusu veya LAN karmaşası eklemeden temiz bir `Setup.exe` hattı kuracak.
+3. Ajan sana **6 kısa soru** soracak (Seviye, Framework, Veri Koruma, Update Sunucusu, Sürüm Politikası ve SmartScreen/Code Signing); örneğin sadece **Seviye 1** seçersen update sunucusu veya LAN karmaşası eklemeden temiz bir `Setup.exe` hattı kuracak.
 
 ---
 
@@ -49,4 +49,4 @@ flowchart LR
 | Dosya | Açıklama |
 | :--- | :--- |
 | [`README.md`](./README.md) | Genel tanıtım, mimari özet ve hızlı kullanım talimatı |
-| [`INSTALLER_WIZARD_REHBERI.md`](./INSTALLER_WIZARD_REHBERI.md) | 3 seviyeli teknik reçeteler, üretim tuzakları ve AI Ajanı Kurulum Sihirbazı protokolü |
+| [`INSTALLER_WIZARD_REHBERI.md`](./INSTALLER_WIZARD_REHBERI.md) | 3 seviyeli teknik reçeteler, SmartScreen & dijital imza rehberi, üretim tuzakları ve AI Ajanı Kurulum Sihirbazı protokolü |
